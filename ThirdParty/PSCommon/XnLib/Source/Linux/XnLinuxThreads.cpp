@@ -30,7 +30,7 @@
 //---------------------------------------------------------------------------
 // Code
 //---------------------------------------------------------------------------
-XN_C_API XnStatus xnOSCreateThread(XN_THREAD_PROC_PROTO pThreadProc, const XN_THREAD_PARAM pThreadParam, XN_THREAD_HANDLE* pThreadHandle, const char* pThreadName)
+XN_C_API XnStatus xnOSCreateThread(XN_THREAD_PROC_PROTO pThreadProc, const XN_THREAD_PARAM pThreadParam, XN_THREAD_HANDLE* pThreadHandle)
 {
 	// Validate the input/output pointers (to make sure none of them is NULL)
 	XN_VALIDATE_INPUT_PTR(pThreadProc);
@@ -46,12 +46,6 @@ XN_C_API XnStatus xnOSCreateThread(XN_THREAD_PROC_PROTO pThreadProc, const XN_TH
 		XN_FREE_AND_NULL(*pThreadHandle);
 		return (XN_STATUS_OS_THREAD_CREATION_FAILED);
 	}
-
-  // Thread name is limited to 16 characters including the null-terminating byte
-  char name[16];
-  strncpy(name, pThreadName, 15);
-  name[15] = '\0';
-  pthread_setname_np(**pThreadHandle, name);
 
 	// All is good...
 	return (XN_STATUS_OK);
@@ -178,9 +172,9 @@ XN_C_API XnStatus xnOSSetThreadPriority(XN_THREAD_HANDLE ThreadHandle, XnThreadP
 	if (rc != 0)
 	{
 #if XN_PLATFORM == XN_PLATFORM_ANDROID_ARM
-		//This should also work as a non-root user...
-		xnLogWarning(XN_MASK_OS, "Failed to use pthread_setschedparam (%d). Trying setpriority instead...", errno);
+		xnLogVerbose(XN_MASK_OS, "Can't set scheduling (%d). Using setpriority instead", rc);
 
+		//This should also work as a non-root user...
 		rc = setpriority(PRIO_PROCESS, gettid(), -8); //-8 is defined as ANDROID_PRIORITY_URGENT_DISPLAY.
 		if (rc < 0)
 		{

@@ -18,8 +18,8 @@
 *  limitations under the License.                                            *
 *                                                                            *
 *****************************************************************************/
-#ifndef _ONI_C_PROPERTIES_H_
-#define _ONI_C_PROPERTIES_H_
+#ifndef ONICPROPERTIES_H
+#define ONICPROPERTIES_H
 
 // Device properties
 enum
@@ -43,7 +43,6 @@ enum
 	ONI_STREAM_PROPERTY_HORIZONTAL_FOV		= 1, // float: radians
 	ONI_STREAM_PROPERTY_VERTICAL_FOV		= 2, // float: radians
 	ONI_STREAM_PROPERTY_VIDEO_MODE			= 3, // OniVideoMode*
-  ONI_STREAM_PROPERTY_SOFT_VIDEO_MODE			= 303, // OniVideoMode*
 
 	ONI_STREAM_PROPERTY_MAX_VALUE			= 4, // int
 	ONI_STREAM_PROPERTY_MIN_VALUE			= 5, // int
@@ -66,4 +65,4 @@ enum
 	ONI_DEVICE_COMMAND_SEEK				= 1, // OniSeek
 };
 
-#endif // _ONI_C_PROPERTIES_H_
+#endif // ONICPROPERTIES_H

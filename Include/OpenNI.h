@@ -18,8 +18,8 @@
 *  limitations under the License.                                            *
 *                                                                            *
 *****************************************************************************/
-#ifndef _OPENNI_H_
-#define _OPENNI_H_
+#ifndef OPENNI_H
+#define OPENNI_H
 
 #include "OniPlatform.h"
 #include "OniProperties.h"
@@ -82,15 +82,32 @@ typedef struct
 	uint8_t y2;
 } YUV422DoublePixel;
 
+/**
+ Holds the value of two pixels in YUV422 format (Luminance/Chrominance,16-bits/pixel).
+ The first pixel has the values y1, u, v.
+ The second pixel has the values y2, u, v.
+*/
+typedef struct
+{
+	/** Overall luminance value of first pixel. */
+	uint8_t y1;
+	/** First chrominance value for two pixels, stored as blue luminance difference signal. */
+	uint8_t u;
+	/** Overall luminance value of second pixel. */
+	uint8_t y2;
+	/** Second chrominance value for two pixels, stored as red luminance difference signal. */
+	uint8_t v;
+} YUYVDoublePixel;
+
 /** This special URI can be passed to @ref Device::open() when the application has no concern for a specific device. */
-#if ONI_PLATFORM != ONI_PLATFORM_WIN32
-#pragma GCC diagnostic ignored "-Wunused-variable"
-#pragma GCC diagnostic push
-#endif
-static const char* ANY_DEVICE = NULL;
-#if ONI_PLATFORM != ONI_PLATFORM_WIN32
-#pragma GCC diagnostic pop
-#endif
+class _NullString
+{
+public:
+	_NullString() {}
+	operator const char*() const { return NULL; }
+};
+
+static const _NullString ANY_DEVICE;
 
 /**
 Provides a simple array class used throughout the API. Wraps a primitive array
@@ -945,13 +962,6 @@ public:
 		return videoMode;
 	}
 
-  VideoMode getSoftVideoMode() const
-  {
-    VideoMode videoMode;
-		getProperty<OniVideoMode>(STREAM_PROPERTY_SOFT_VIDEO_MODE, static_cast<OniVideoMode*>(&videoMode));
-		return videoMode;
-  }
-
 	/**
 	Changes the current video mode of this stream.  Recommended practice is to use @ref Device::getSensorInfo(), and
 	then @ref SensorInfo::getSupportedVideoModes() to obtain a list of valid video mode settings for this stream.  Then,
@@ -964,11 +974,6 @@ public:
 	{
 		return setProperty<OniVideoMode>(STREAM_PROPERTY_VIDEO_MODE, static_cast<const OniVideoMode&>(videoMode));
 	}
-
-  Status setSoftVideoMode(const VideoMode& videoMode)
-  {
-    return setProperty<OniVideoMode>(STREAM_PROPERTY_SOFT_VIDEO_MODE, static_cast<const OniVideoMode&>(videoMode));
-  }
 
 	/**
 	Provides the maximum possible value for pixels obtained by this stream.  This is most useful for
@@ -2307,7 +2312,6 @@ public:
 	/** 
 	 * Set minimum severity for log produce
 	
-	 * @param	const char * strMask	[in]	Logger name
 	 * @param	int nMinSeverity	[in]	Logger severity
 	 *
 	 * @retval STATUS_OK Upon successful completion.
@@ -2756,7 +2760,6 @@ void Device::close()
 	}
 }
 
-
 }
 
-#endif // _OPEN_NI_HPP_
+#endif // OPENNI_H

@@ -55,10 +55,11 @@ typedef struct
 		PadInfo padInfo_QQVGA;	
 		PadInfo padInfo_QVGA;
 		PadInfo padInfo_VGA;
+		PadInfo padInfo_SXGA;//xice
 		RegistrationInfo registrationInfo_QQVGA;
 		RegistrationInfo registrationInfo_QVGA;
 		RegistrationInfo registrationInfo_VGA;
-
+		RegistrationInfo registrationInfo_SXGA ; //xice
 		double zpps;
 		int zpd;
 		double dcrcdist;

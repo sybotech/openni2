@@ -18,8 +18,8 @@
 *  limitations under the License.                                            *
 *                                                                            *
 *****************************************************************************/
-#ifndef _ONI_PROPERTIES_H_
-#define _ONI_PROPERTIES_H_
+#ifndef ONIPROPERTIES_H
+#define ONIPROPERTIES_H
 
 namespace openni
 {
@@ -46,7 +46,6 @@ enum
 	STREAM_PROPERTY_HORIZONTAL_FOV			= 1, // float: radians
 	STREAM_PROPERTY_VERTICAL_FOV			= 2, // float: radians
 	STREAM_PROPERTY_VIDEO_MODE			= 3, // OniVideoMode*
-  STREAM_PROPERTY_SOFT_VIDEO_MODE			= 303, // OniVideoMode*
 
 	STREAM_PROPERTY_MAX_VALUE			= 4, // int
 	STREAM_PROPERTY_MIN_VALUE			= 5, // int
@@ -71,4 +70,4 @@ enum
 };
 
 } // namespace openni
-#endif // _ONI_PROPERTIES_H_
+#endif // ONIPROPERTIES_H

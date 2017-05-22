@@ -89,6 +89,7 @@ set(XnLib_SRC ${XnLib_SRC}
   ./ThirdParty/PSCommon/XnLib/Source/XnLog.cpp
   ./ThirdParty/PSCommon/XnLib/Source/XnLogFileWriter.cpp
   ./ThirdParty/PSCommon/XnLib/Source/XnOS.cpp
+  ./ThirdParty/PSCommon/XnLib/Source/XnJpeg.cpp
   ./ThirdParty/PSCommon/XnLib/Source/XnOSMemoryProfiling.cpp
   ./ThirdParty/PSCommon/XnLib/Source/XnProfiling.cpp
   ./ThirdParty/PSCommon/XnLib/Source/XnScheduler.cpp
@@ -133,9 +134,29 @@ file(GLOB openni2_ps1080_SRC
   "./Source/Drivers/PS1080/Sensor/*.cpp"
 )
 set(openni2_ps1080_SRC ${openni2_ps1080_SRC} ${XnLib_SRC})
-add_library(PS1080 ${openni2_ps1080_SRC})
+add_library(PS1080 SHARED ${openni2_ps1080_SRC})
 target_link_libraries(PS1080 ${XnLib_LIBS})
 install(TARGETS PS1080 LIBRARY DESTINATION lib/OpenNI2/Drivers ARCHIVE DESTINATION lib)
+
+# Build OpenNI Orbbec Drivers
+include_directories("./ThirdParty/Orbbec/Include/")
+
+include_directories("./Source/Drivers/orbbec/")
+include_directories("./Source/Drivers/orbbec/Include/")
+include_directories("./Include/")
+include_directories(${DepthUtils_INCLUDE_DIRS})
+file(GLOB openni2_orbbec_SRC
+  "./Source/DepthUtils/*.cpp"
+  "./Source/Drivers/orbbec/Core/*.cpp"
+  "./Source/Drivers/orbbec/DDK/*.cpp"
+  "./Source/Drivers/orbbec/DriverImpl/*.cpp"
+  "./Source/Drivers/orbbec/Formats/*.cpp"
+  "./Source/Drivers/orbbec/Sensor/*.cpp"
+)
+set(openni2_orbbec_SRC ${openni2_orbbec_SRC} ${XnLib_SRC})
+add_library(orbbec SHARED ${openni2_orbbec_SRC})
+target_link_libraries(orbbec ${XnLib_LIBS})
+install(TARGETS orbbec LIBRARY DESTINATION lib/OpenNI2/Drivers ARCHIVE DESTINATION lib)
 
 # Build OpenNI
 include_directories("./Include")
@@ -158,7 +179,7 @@ file(GLOB OpenNI2_driver_HDR
   "./Include/Driver/*.h"
 )
 
-add_library(OpenNI2 ${openni2_SRC} ${OpenNI2_HDR} ${OpenNI2_driver_HDR})
+add_library(OpenNI2 SHARED ${openni2_SRC} ${OpenNI2_HDR} ${OpenNI2_driver_HDR})
 target_link_libraries(OpenNI2 ${XnLib_LIBS})
 install(TARGETS OpenNI2 LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
 

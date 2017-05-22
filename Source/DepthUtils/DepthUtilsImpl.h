@@ -51,15 +51,23 @@ private:
 
 private:
 	DepthUtilsSensorCalibrationInfo m_blob;
+
+
 	XnUInt16* m_pDepthToShiftTable_QQVGA;
 	XnUInt16* m_pDepthToShiftTable_QVGA;
 	XnUInt16* m_pDepthToShiftTable_VGA;
+
+	XnUInt16* m_pDepthToShiftTable_SXGA;  //xice
+
 	XnUInt16* m_pRegistrationTable_QQVGA;
 	XnUInt16* m_pRegistrationTable_QVGA;
 	XnUInt16* m_pRegistrationTable_VGA;
 
+	XnUInt16* m_pRegistrationTable_SXGA;  //xice
+
 	PadInfo* m_pPadInfo;
 	RegistrationInfo* m_pRegistrationInfo;
+	
 	XnUInt16* m_pRegTable;
 	XnUInt16* m_pDepth2ShiftTable;
 

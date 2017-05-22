@@ -37,6 +37,7 @@ cd $ORIG_PATH
 if [ "`uname -s`" != "Darwin" ]; then
     # Install UDEV rules for USB device
     cp ${SCRIPT_PATH}/primesense-usb.rules /etc/udev/rules.d/557-primesense-usb.rules 
+    cp ${SCRIPT_PATH}/orbbec-usb.rules /etc/udev/rules.d/56-orbbec-usb.rules 
 fi
 
 OUT_FILE="$SCRIPT_PATH/OpenNIDevEnvironment"

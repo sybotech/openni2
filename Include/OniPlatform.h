@@ -18,8 +18,8 @@
 *  limitations under the License.                                            *
 *                                                                            *
 *****************************************************************************/
-#ifndef _ONI_PLATFORM_H_
-#define _ONI_PLATFORM_H_
+#ifndef ONIPLATFORM_H
+#define ONIPLATFORM_H
 
 // Supported platforms
 #define ONI_PLATFORM_WIN32 1
@@ -39,7 +39,7 @@
 #	include "Android-Arm/OniPlatformAndroid-Arm.h"
 #elif (__linux__ && (i386 || __x86_64__))
 #	include "Linux-x86/OniPlatformLinux-x86.h"
-#elif (__linux__ && __arm__)
+#elif (__linux__ && (__arm__ || __aarch64__))
 #	include "Linux-Arm/OniPlatformLinux-Arm.h"
 #elif _ARC
 #	include "ARC/OniPlaformARC.h"
@@ -69,4 +69,4 @@
 #endif // OPENNI2_EXPORT
 
 
-#endif // _ONI_PLATFORM_H_
+#endif // ONIPLATFORM_H

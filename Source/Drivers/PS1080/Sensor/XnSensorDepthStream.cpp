@@ -374,7 +374,7 @@ XnStatus XnSensorDepthStream::SetActualRead(XnBool bRead)
 		{
 			xnLogVerbose(XN_MASK_DEVICE_SENSOR, "Creating USB depth read thread...");
 			XnSpecificUsbDevice* pUSB = GetHelper()->GetPrivateData()->pSpecificDepthUsb;
-			nRetVal = xnUSBInitReadThread(pUSB->pUsbConnection->UsbEp, pUSB->nChunkReadBytes, pUSB->nNumberOfBuffers, pUSB->nTimeout, XnDeviceSensorProtocolUsbEpCb, pUSB, "Depth");
+			nRetVal = xnUSBInitReadThread(pUSB->pUsbConnection->UsbEp, pUSB->nChunkReadBytes, pUSB->nNumberOfBuffers, pUSB->nTimeout, XnDeviceSensorProtocolUsbEpCb, pUSB);
 			XN_IS_STATUS_OK(nRetVal);
 		}
 		else
@@ -632,7 +632,7 @@ XnStatus XnSensorDepthStream::SetRegistrationType(XnProcessingType type)
 {
 	XnStatus nRetVal = XN_STATUS_OK;
 
-	if (type != m_RegistrationType.GetValue())
+	if (type != (XnProcessingType)m_RegistrationType.GetValue())
 	{
 		nRetVal = DecideFirmwareRegistration((XnBool)m_DepthRegistration.GetValue(), type, GetResolution());
 		XN_IS_STATUS_OK(nRetVal);

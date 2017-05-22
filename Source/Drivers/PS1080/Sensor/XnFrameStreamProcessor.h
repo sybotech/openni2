@@ -18,8 +18,8 @@
 *  limitations under the License.                                            *
 *                                                                            *
 *****************************************************************************/
-#ifndef __XN_FRAME_STREAM_PROCESSOR_H__
-#define __XN_FRAME_STREAM_PROCESSOR_H__
+#ifndef XNFRAMESTREAMPROCESSOR_H
+#define XNFRAMESTREAMPROCESSOR_H
 
 //---------------------------------------------------------------------------
 // Includes
@@ -178,9 +178,6 @@ private:
 	XnBool m_bAllowDoubleSOF;
 	XnUInt16 m_nLastSOFPacketID;
 	XnUInt64 m_nFirstPacketTimestamp;
-
-  XnUInt64 m_nLastSOFTimestamp;
-  XnBool m_bProcessNextFrame;
 };
 
-#endif //__XN_FRAME_STREAM_PROCESSOR_H__
+#endif // XNFRAMESTREAMPROCESSOR_H

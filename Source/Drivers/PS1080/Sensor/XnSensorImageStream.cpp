@@ -60,6 +60,7 @@ XnSensorImageStream::XnSensorImageStream(const XnChar* StreamName, XnSensorObjec
 
 	m_Exposure(ONI_STREAM_PROPERTY_EXPOSURE, "Exposure", XN_IMAGE_STREAM_DEFAULT_EXPOSURE_BAR),
 	m_Gain(ONI_STREAM_PROPERTY_GAIN, "Gain", XN_IMAGE_STREAM_DEFAULT_GAIN),
+	m_FastZoomCrop(XN_STREAM_PROPERTY_FAST_ZOOM_CROP, "FastZoomCrop", false),
 
 	m_ActualRead(XN_STREAM_PROPERTY_ACTUAL_READ_DATA, "ActualReadData", FALSE),
 	m_HorizontalFOV(ONI_STREAM_PROPERTY_HORIZONTAL_FOV, "HorizontalFov"),
@@ -85,12 +86,13 @@ XnStatus XnSensorImageStream::Init()
 	m_AutoExposure.UpdateSetCallback(SetAutoExposureCallback, this);
 	m_Exposure.UpdateSetCallback(SetExposureCallback, this);
 	m_Gain.UpdateSetCallback(SetGainCallback, this);
+	m_FastZoomCrop.UpdateSetCallback(SetFastZoomCropCallback, this);
 	m_AutoWhiteBalance.UpdateSetCallback(SetAutoWhiteBalanceCallback, this);
 	m_ActualRead.UpdateSetCallback(SetActualReadCallback, this); 
 
 	// add properties
 	XN_VALIDATE_ADD_PROPERTIES(this, &m_InputFormat, &m_AntiFlicker, &m_ImageQuality, 
-		&m_CroppingMode, &m_ActualRead, &m_HorizontalFOV, &m_VerticalFOV, &m_AutoExposure, &m_AutoWhiteBalance, &m_Exposure, &m_Gain);
+		&m_CroppingMode, &m_ActualRead, &m_HorizontalFOV, &m_VerticalFOV, &m_AutoExposure, &m_AutoWhiteBalance, &m_Exposure, &m_Gain, &m_FastZoomCrop);
 
 	// set base properties default values
 	nRetVal = ResolutionProperty().UnsafeUpdateValue(XN_IMAGE_STREAM_DEFAULT_RESOLUTION);
@@ -217,6 +219,8 @@ XnStatus XnSensorImageStream::MapPropertiesToFirmware()
 	XN_IS_STATUS_OK(nRetVal);;
 	nRetVal = m_Helper.MapFirmwareProperty(m_Gain, GetFirmwareParams()->m_ImageGain, TRUE);
 	XN_IS_STATUS_OK(nRetVal);;
+	nRetVal = m_Helper.MapFirmwareProperty(m_FastZoomCrop, GetFirmwareParams()->m_FastZoomCrop, TRUE);
+	XN_IS_STATUS_OK(nRetVal);;
 
 	return (XN_STATUS_OK);
 }
@@ -334,7 +338,7 @@ XnStatus XnSensorImageStream::SetActualRead(XnBool bRead)
 		{
 			xnLogVerbose(XN_MASK_DEVICE_SENSOR, "Creating USB image read thread...");
 			XnSpecificUsbDevice* pUSB = GetHelper()->GetPrivateData()->pSpecificImageUsb;
-			nRetVal = xnUSBInitReadThread(pUSB->pUsbConnection->UsbEp, pUSB->nChunkReadBytes, pUSB->nNumberOfBuffers, pUSB->nTimeout, XnDeviceSensorProtocolUsbEpCb, pUSB, "Image");
+			nRetVal = xnUSBInitReadThread(pUSB->pUsbConnection->UsbEp, pUSB->nChunkReadBytes, pUSB->nNumberOfBuffers, pUSB->nTimeout, XnDeviceSensorProtocolUsbEpCb, pUSB);
 			XN_IS_STATUS_OK(nRetVal);
 		}
 		else
@@ -755,6 +759,14 @@ XnStatus XnSensorImageStream::SetGain(XnUInt64 nValue)
 
 	return (XN_STATUS_OK);
 }
+XnStatus XnSensorImageStream::SetFastZoomCrop(XnBool bFastZoomCrop)
+{
+	XnStatus nRetVal = XN_STATUS_OK;
+
+	nRetVal = m_Helper.SimpleSetFirmwareParam(m_FastZoomCrop, (XnUInt16)bFastZoomCrop);
+
+	return nRetVal;
+}
 
 XnStatus XnSensorImageStream::CropImpl(OniFrame* pFrame, const OniCropping* pCropping)
 {
@@ -941,4 +953,9 @@ XnStatus XN_CALLBACK_TYPE XnSensorImageStream::SetGainCallback(XnActualIntProper
 {
 	XnSensorImageStream* pStream = (XnSensorImageStream*)pCookie;
 	return pStream->SetGain(nValue);
+}
+XnStatus XN_CALLBACK_TYPE XnSensorImageStream::SetFastZoomCropCallback(XnActualIntProperty* /*pSender*/, XnUInt64 nValue, void* pCookie)
+{
+	XnSensorImageStream* pStream = (XnSensorImageStream*)pCookie;
+	return pStream->SetFastZoomCrop((XnBool)nValue);
 }

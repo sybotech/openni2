@@ -18,8 +18,8 @@
 *  limitations under the License.                                            *
 *                                                                            *
 *****************************************************************************/
-#ifndef __XN_SENSOR_H__
-#define __XN_SENSOR_H__
+#ifndef XNSENSOR_H
+#define XNSENSOR_H
 
 //---------------------------------------------------------------------------
 // Includes
@@ -43,10 +43,6 @@
 class XnSensor : public XnDeviceBase
 {
 	friend class XnServerSensorInvoker;
-
-public:
-  static OniVideoMode ms_SoftVideoMode;
-  static OniVideoMode ms_VideoMode;
 
 public:
 	XnSensor(XnBool bResetOnStartup = TRUE, XnBool bLeanInit = FALSE);
@@ -93,12 +89,6 @@ public:
 	inline XnBool IsTecDebugPring() const { return (XnBool)m_FirmwareTecDebugPrint.GetValue(); }
 
 	XnStatus SetFrameSyncStreamGroup(XnDeviceStream** ppStreamList, XnUInt32 numStreams);
-
-  static OniVideoMode* GetVideoMode();
-  static XnStatus SetVideoMode(const OniVideoMode* pVideoMode);
-
-  static OniVideoMode* GetSoftVideoMode();
-  static XnStatus SetSoftVideoMode(const OniVideoMode* pVideoMode);
 
 protected:
 	virtual XnStatus CreateStreamImpl(const XnChar* strType, const XnChar* strName, const XnActualPropertiesHash* pInitialSet);
@@ -175,6 +165,7 @@ private:
 	XnStatus WriteFlashFile(const XnParamFileData* pFile);
 	XnStatus SetProjectorFault(XnProjectorFaultData* pProjectorFaultData);
 	XnStatus RunBIST(XnUInt32 nTestsMask, XnUInt32* pnFailures);
+	XnStatus SetReadAllEndpoints(XnBool bEnabled);
 
 	//---------------------------------------------------------------------------
 	// Callbacks
@@ -212,6 +203,7 @@ private:
 	static XnStatus XN_CALLBACK_TYPE SetFirmwareLogIntervalCallback(XnActualIntProperty* pSender, XnUInt64 nValue, void* pCookie);
 	static XnStatus XN_CALLBACK_TYPE SetFirmwareLogPrintCallback(XnActualIntProperty* pSender, XnUInt64 nValue, void* pCookie);
 	static XnStatus XN_CALLBACK_TYPE SetFirmwareCPUIntervalCallback(XnActualIntProperty* pSender, XnUInt64 nValue, void* pCookie);
+	static XnStatus XN_CALLBACK_TYPE SetReadAllEndpointsCallback(XnActualIntProperty* pSender, XnUInt64 nValue, void* pCookie);
 	static XnStatus XN_CALLBACK_TYPE SetAPCEnabledCallback(XnActualIntProperty* pSender, XnUInt64 nValue, void* pCookie);
 	static XnStatus XN_CALLBACK_TYPE SetI2CCallback(XnGeneralProperty* pSender, const OniGeneralBuffer& gbValue, void* pCookie);
 	static XnStatus XN_CALLBACK_TYPE DeleteFileCallback(XnIntProperty* pSender, XnUInt64 nValue, void* pCookie);
@@ -250,6 +242,7 @@ private:
 	XnGeneralProperty m_CmosBlankingTime;
 	XnIntProperty m_Reset;
 	XnVersions m_VersionData;
+	XnDevicePrivateData m_DevicePrivateData;
 	XnActualGeneralProperty m_Version;
 	XnGeneralProperty m_FixedParam;
 	XnActualStringProperty m_ID;
@@ -269,6 +262,7 @@ private:
 	XnActualIntProperty m_FirmwareCPUInterval;
 	XnActualIntProperty m_APCEnabled;
 	XnActualIntProperty m_FirmwareTecDebugPrint;
+	XnActualIntProperty m_ReadAllEndpoints;
 	XnGeneralProperty m_I2C;
 	XnIntProperty m_DeleteFile;
 	XnIntProperty m_TecSetPoint;
@@ -284,7 +278,6 @@ private:
 	XnGeneralProperty m_BIST;
 	XnGeneralProperty m_ProjectorFault;
 	XnSensorFirmware m_Firmware;
-	XnDevicePrivateData m_DevicePrivateData;
 	XnSensorFPS m_FPS;
 	XnCmosInfo m_CmosInfo;
 	XnSensorIO m_SensorIO;
@@ -298,7 +291,7 @@ private:
 	XnDumpFile* m_FirmwareLogDump;
 	XnDumpFile* m_FrameSyncDump;
 	XnBool m_nFrameSyncEnabled;
-	typedef struct  
+	typedef struct
 	{
 		XnDeviceStream* pStream;
 		OniFrame* pFrame;
@@ -314,4 +307,4 @@ private:
 	XnChar m_strGlobalConfigFile[XN_FILE_MAX_PATH];
 };
 
-#endif //__XN_SENSOR_H__
+#endif // XNSENSOR_H

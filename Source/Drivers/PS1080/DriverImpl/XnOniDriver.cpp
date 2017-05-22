@@ -38,9 +38,7 @@ XnOniDriver::XnOpenNILogWriter::XnOpenNILogWriter(OniDriverServices* pDriverServ
 
 void XnOniDriver::XnOpenNILogWriter::WriteEntry(const XnLogEntry* pEntry)
 {
-// This is commented out by Aldebaran (vrabaud) as it seems to crash when compiled on Samuel's farm (but not when compiled anywhere else)
-// The crash is a recursive call that never ends. We also not use the logs.
-//	m_pDriverServices->log(m_pDriverServices, pEntry->nSeverity, pEntry->strFile, pEntry->nLine, pEntry->strMask, pEntry->strMessage);
+	m_pDriverServices->log(m_pDriverServices, pEntry->nSeverity, pEntry->strFile, pEntry->nLine, pEntry->strMask, pEntry->strMessage);
 }
 
 void XnOniDriver::XnOpenNILogWriter::WriteUnformatted(const XnChar* /*strMessage*/)
@@ -235,11 +233,8 @@ void XN_CALLBACK_TYPE XnOniDriver::OnDevicePropertyChanged(const XnChar* ModuleN
 		XnStatus nRetVal = pSensor->GetProperty(ModuleName, XN_MODULE_PROPERTY_ERROR_STATE, &errorState);
 		if (nRetVal == XN_STATUS_OK)
 		{
-			if (errorState == XN_STATUS_DEVICE_NOT_CONNECTED)
-			{
-				pThis->deviceDisconnected(pDevice->GetInfo());
-			}
-			else
+			// ignore NOT_CONNECTED state. It's already handled by the DeviceEnumeration class
+			if (errorState != XN_STATUS_DEVICE_NOT_CONNECTED)
 			{
 				int errorStateValue = XN_ERROR_STATE_OK;
 				switch (errorState)

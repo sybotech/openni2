@@ -1,9 +1,9 @@
 /*****************************************************************************
 *                                                                            *
-*  PrimeSense PSCommon Library                                               *
+*  OpenNI 2.x Alpha                                                          *
 *  Copyright (C) 2012 PrimeSense Ltd.                                        *
 *                                                                            *
-*  This file is part of PSCommon.                                            *
+*  This file is part of OpenNI.                                              *
 *                                                                            *
 *  Licensed under the Apache License, Version 2.0 (the "License");           *
 *  you may not use this file except in compliance with the License.          *
@@ -30,6 +30,21 @@
 #undef ONI_PLATFORM_STRING
 #define ONI_PLATFORM ONI_PLATFORM_MACOSX
 #define ONI_PLATFORM_STRING "MacOSX"
+
+#include "TargetConditionals.h"
+#if (TARGET_IPHONE_SIMULATOR == 1) || (TARGET_OS_IPHONE == 1)
+    #define ONI_PLATFORM_IOS
+
+    #undef ONI_PLATFORM_STRING
+    #define ONI_PLATFORM_STRING "iOS"
+#elif TARGET_OS_MAC
+    #ifdef XN_XCODE_BUILD
+        #define ONI_PLATFORM_MACOSX_XCODE
+
+        #undef ONI_PLATFORM_STRING
+        #define ONI_PLATFORM_STRING "MacOSX-Xcode"
+    #endif
+#endif
 
 #define ONI_PLATFORM_HAS_NO_TIMED_OPS
 #define ONI_PLATFORM_HAS_NO_CLOCK_GETTIME

@@ -212,6 +212,13 @@ XnStatus DepthUtilsImpl::SetDepthConfiguration(int xres, int yres, OniPixelForma
 		m_pDepth2ShiftTable = (XnUInt16*)m_pDepthToShiftTable_VGA;
 		m_pRegistrationInfo = &m_blob.params1080.registrationInfo_VGA;
 	}
+	else if (xres == 1280 && yres == 1024)
+	{
+		m_pPadInfo = &m_blob.params1080.padInfo_SXGA;
+		m_pRegTable = m_pRegistrationTable_SXGA;
+		m_pDepth2ShiftTable = (XnUInt16*)m_pDepthToShiftTable_SXGA;
+		m_pRegistrationInfo = &m_blob.params1080.registrationInfo_SXGA;
+	}
 	else
 	{
 		return XN_STATUS_BAD_PARAM;
@@ -262,44 +269,30 @@ XnStatus DepthUtilsImpl::TranslateSinglePixel(XnUInt32 x, XnUInt32 y, unsigned s
 
 	/////////////////////////////////////
 
-	XnDouble fullXRes;
+	XnDouble fullXRes = m_colorResolution.x;
 	XnDouble fullYRes;
 	XnBool bCrop = FALSE;
 
-	// if color aspect ratio is different from depth one, assume it's cropped
-	if (m_colorResolution.x * m_depthResolution.y < m_colorResolution.y * m_depthResolution.x)
+	if ((9 * m_colorResolution.x / m_colorResolution.y) == 16)
 	{
-		fullXRes = m_colorResolution.x;
-		fullYRes = fullXRes * m_depthResolution.y / m_depthResolution.x;
-		bCrop = TRUE;
-	}
-	else if (m_colorResolution.x * m_depthResolution.y > m_colorResolution.y * m_depthResolution.x)
-	{
-		fullYRes = m_colorResolution.y;
-		fullXRes = fullYRes * m_depthResolution.x / m_depthResolution.y;
+		fullYRes = m_colorResolution.x * 4 / 5;
 		bCrop = TRUE;
 	}
 	else
 	{
-		fullXRes = m_colorResolution.x;
 		fullYRes = m_colorResolution.y;
 		bCrop = FALSE;
 	}
 
-	// inflate translated pixel from current resolution into full one
+	// inflate to full res
 	imageX = (XnUInt32)(fullXRes / m_depthResolution.x * imageX);
 	imageY = (XnUInt32)(fullYRes / m_depthResolution.y * imageY);
 
 	if (bCrop)
 	{
 		// crop from center
-		imageY += (XnUInt32)(m_colorResolution.y - fullYRes)/2;
+		imageY -= (XnUInt32)(fullYRes - m_colorResolution.y)/2;
 		if (imageY > (XnUInt32)m_colorResolution.y)
-		{
-			return XN_STATUS_BAD_PARAM;
-		}
-		imageX += (XnUInt32)(m_colorResolution.x - fullXRes)/2;
-		if (imageX > (XnUInt32)m_colorResolution.x)
 		{
 			return XN_STATUS_BAD_PARAM;
 		}

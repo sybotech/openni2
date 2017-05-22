@@ -23,7 +23,7 @@
 //---------------------------------------------------------------------------
 #include <XnUSB.h>
 
-#if (XN_PLATFORM == XN_PLATFORM_ANDROID_ARM)
+#if (XN_PLATFORM == XN_PLATFORM_ANDROID_ARM) || defined(XN_PLATFORM_MACOSX_XCODE) || defined(XN_PLATFORM_IOS)
 #include <libusb.h>
 #else
 #include <libusb-1.0/libusb.h>
@@ -92,7 +92,7 @@ XnBool g_bShouldRunUDEVThread = false;
 
 #define XN_MASK_USB "xnUSB"
 
-#define XN_USB_HANDLE_EVENTS_TIMEOUT 5000 /*default was 500*/
+#define XN_USB_HANDLE_EVENTS_TIMEOUT 500
 
 #define XN_VALIDATE_DEVICE_HANDLE(x)				\
 	if (x == NULL)									\
@@ -122,37 +122,10 @@ void xnUSBDeviceConnected(struct udev_device *dev)
 	XnUSBConnectedDevice *pConnected;
 	pConnected = XN_NEW(XnUSBConnectedDevice);
 
-  const char * tmp = udev_device_get_sysattr_value(dev, "idVendor");
-  if (NULL != tmp)
-    pConnected->nVendorID  = strtoul(tmp,  NULL, 16);
-  else {
-    xnLogError(XN_MASK_USB, "Got device connection event - for an unknown device!");
-    return;
-  }
-
-  tmp = udev_device_get_sysattr_value(dev, "idProduct");
-  if (NULL != tmp)
-    pConnected->nProductID = strtoul(tmp, NULL, 16);
-  else {
-    xnLogError(XN_MASK_USB, "Got device connection event - for an unknown device!");
-    return;
-  }
-
-  tmp = udev_device_get_sysattr_value(dev, "busnum");
-  if (NULL != tmp)
-  pConnected->nBusNum = strtoul(tmp, NULL, 10);
-  else {
-    xnLogError(XN_MASK_USB, "Got device connection event - for an unknown device!");
-    return;
-  }
-
-  tmp = udev_device_get_sysattr_value(dev, "devnum");
-  if (NULL != tmp)
-  pConnected->nDevNum = strtoul(tmp, NULL, 10);
-  else {
-    xnLogError(XN_MASK_USB, "Got device connection event - for an unknown device!");
-    return;
-  }
+	pConnected->nVendorID  = strtoul(udev_device_get_sysattr_value(dev,"idVendor"),  NULL, 16);
+	pConnected->nProductID = strtoul(udev_device_get_sysattr_value(dev,"idProduct"), NULL, 16);
+	pConnected->nBusNum    = strtoul(udev_device_get_sysattr_value(dev,"busnum"),    NULL, 10);
+	pConnected->nDevNum    = strtoul(udev_device_get_sysattr_value(dev,"devnum"),    NULL, 10);
 
 	// copy the device node path aside, to be used upon removal
 	xnOSStrCopy(pConnected->strNode, udev_device_get_devnode(dev), XN_FILE_MAX_PATH);
@@ -389,8 +362,8 @@ XN_THREAD_PROC xnUSBHandleEventsThread(XN_THREAD_PARAM pThreadParam)
 {
 	// init timeout
 	struct timeval timeout;
-	timeout.tv_sec = XN_USB_HANDLE_EVENTS_TIMEOUT / 1000000;
-	timeout.tv_usec = XN_USB_HANDLE_EVENTS_TIMEOUT % 1000000;
+	timeout.tv_sec = XN_USB_HANDLE_EVENTS_TIMEOUT / 1000;
+	timeout.tv_usec = XN_USB_HANDLE_EVENTS_TIMEOUT % 1000;
 	
 	while (g_InitData.bShouldThreadRun)
 	{
@@ -418,7 +391,7 @@ XnStatus xnUSBPlatformSpecificInit()
 #ifdef XN_USE_UDEV
 	// initialize the UDEV Events thread
 	g_bShouldRunUDEVThread = true;
-	nRetVal = xnOSCreateThread(xnUSBUDEVEventsThread, NULL, &g_hUDEVThread, "ONI_USBUDEVEvents");
+	nRetVal = xnOSCreateThread(xnUSBUDEVEventsThread, NULL, &g_hUDEVThread);
 	if (nRetVal != XN_STATUS_OK)
 	{
 		g_hUDEVThread = NULL;
@@ -451,7 +424,7 @@ XnStatus xnUSBAsynchThreadAddRef()
 		g_InitData.bShouldThreadRun = TRUE;
 		
 		// and start thread
-		nRetVal = xnOSCreateThread(xnUSBHandleEventsThread, NULL, &g_InitData.hThread, "ONI_USBHandleEvents");
+		nRetVal = xnOSCreateThread(xnUSBHandleEventsThread, NULL, &g_InitData.hThread);
 		if (nRetVal != XN_STATUS_OK)
 		{
 			// clean-up
@@ -1551,7 +1524,7 @@ void xnTransferCallback(libusb_transfer *pTransfer)
 	}
 }
 
-XN_C_API XnStatus xnUSBInitReadThread(XN_USB_EP_HANDLE pEPHandle, XnUInt32 nBufferSize, XnUInt32 nNumBuffers, XnUInt32 nTimeOut, XnUSBReadCallbackFunctionPtr pCallbackFunction, void* pCallbackData, const char* pStreamName)
+XN_C_API XnStatus xnUSBInitReadThread(XN_USB_EP_HANDLE pEPHandle, XnUInt32 nBufferSize, XnUInt32 nNumBuffers, XnUInt32 nTimeOut, XnUSBReadCallbackFunctionPtr pCallbackFunction, void* pCallbackData)
 {
 	XnStatus nRetVal = XN_STATUS_OK;
 	
@@ -1647,12 +1620,8 @@ XN_C_API XnStatus xnUSBInitReadThread(XN_USB_EP_HANDLE pEPHandle, XnUInt32 nBuff
 		}
 	}
 
-  // Build thread name as prefix+streamName (eg: ONI_USBReadDepth)
-  char threadName[255];
-  strcpy(threadName, "ONI_USBRead");
-  strcat(threadName, pStreamName);
 	// create a thread to perform the asynchronous read operations
-	nRetVal = xnOSCreateThread(xnUSBReadThreadMain, &pEPHandle->ThreadData, &pThreadData->hReadThread, threadName);
+	nRetVal = xnOSCreateThread(xnUSBReadThreadMain, &pEPHandle->ThreadData, &pThreadData->hReadThread);
 	if (nRetVal != XN_STATUS_OK)
 	{
 		xnCleanupThreadData(pThreadData);
