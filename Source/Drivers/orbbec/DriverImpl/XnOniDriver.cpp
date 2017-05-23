@@ -38,6 +38,7 @@ XnOniDriver::XnOpenNILogWriter::XnOpenNILogWriter(OniDriverServices* pDriverServ
 
 void XnOniDriver::XnOpenNILogWriter::WriteEntry(const XnLogEntry* pEntry)
 {
+	return;
 	m_pDriverServices->log(m_pDriverServices, pEntry->nSeverity, pEntry->strFile, pEntry->nLine, pEntry->strMask, pEntry->strMessage);
 }
 

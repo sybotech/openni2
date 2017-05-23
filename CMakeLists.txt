@@ -70,6 +70,7 @@ set(XnLib_HDRS
   ${UDEV_INCLUDE_DIRS}
   ${USB_1_INCLUDE_DIRS}
 )
+
 include_directories(${XnLib_HDRS})
 
 # Do not build XnLib as static but build it every time (a bit slower)
@@ -78,34 +79,35 @@ file(GLOB XnLib_SRC
 )
 # add other sources but remove the symmetric matrix ones
 set(XnLib_SRC ${XnLib_SRC}
-  ./ThirdParty/PSCommon/XnLib/Source/XnDump.cpp
-  ./ThirdParty/PSCommon/XnLib/Source/XnDumpFileWriter.cpp
-  ./ThirdParty/PSCommon/XnLib/Source/XnErrorLogger.cpp
-  ./ThirdParty/PSCommon/XnLib/Source/XnFiles.cpp
-  ./ThirdParty/PSCommon/XnLib/Source/XnFPSCalculator.cpp
-  ./ThirdParty/PSCommon/XnLib/Source/XnLib.cpp
-  ./ThirdParty/PSCommon/XnLib/Source/XnLogAndroidWriter.cpp
-  ./ThirdParty/PSCommon/XnLib/Source/XnLogConsoleWriter.cpp
-  ./ThirdParty/PSCommon/XnLib/Source/XnLog.cpp
-  ./ThirdParty/PSCommon/XnLib/Source/XnLogFileWriter.cpp
-  ./ThirdParty/PSCommon/XnLib/Source/XnOS.cpp
-  ./ThirdParty/PSCommon/XnLib/Source/XnJpeg.cpp
-  ./ThirdParty/PSCommon/XnLib/Source/XnOSMemoryProfiling.cpp
-  ./ThirdParty/PSCommon/XnLib/Source/XnProfiling.cpp
-  ./ThirdParty/PSCommon/XnLib/Source/XnScheduler.cpp
-  ./ThirdParty/PSCommon/XnLib/Source/XnStatus.cpp
-  ./ThirdParty/PSCommon/XnLib/Source/XnStrings.cpp
-  ./ThirdParty/PSCommon/XnLib/Source/XnThreads.cpp
-  ./ThirdParty/PSCommon/XnLib/Source/XnUSB.cpp
-  ./ThirdParty/PSCommon/XnLib/Source/XnVector3D.cpp
+  ThirdParty/PSCommon/XnLib/Source/XnDump.cpp
+  ThirdParty/PSCommon/XnLib/Source/XnDumpFileWriter.cpp
+  ThirdParty/PSCommon/XnLib/Source/XnErrorLogger.cpp
+  ThirdParty/PSCommon/XnLib/Source/XnFiles.cpp
+  ThirdParty/PSCommon/XnLib/Source/XnFPSCalculator.cpp
+  ThirdParty/PSCommon/XnLib/Source/XnLib.cpp
+  ThirdParty/PSCommon/XnLib/Source/XnLogAndroidWriter.cpp
+  ThirdParty/PSCommon/XnLib/Source/XnLogConsoleWriter.cpp
+  ThirdParty/PSCommon/XnLib/Source/XnLog.cpp
+  ThirdParty/PSCommon/XnLib/Source/XnLogFileWriter.cpp
+  ThirdParty/PSCommon/XnLib/Source/XnOS.cpp
+  ThirdParty/PSCommon/XnLib/Source/XnJpeg.cpp
+  ThirdParty/PSCommon/XnLib/Source/XnOSMemoryProfiling.cpp
+  ThirdParty/PSCommon/XnLib/Source/XnProfiling.cpp
+  ThirdParty/PSCommon/XnLib/Source/XnScheduler.cpp
+  ThirdParty/PSCommon/XnLib/Source/XnStatus.cpp
+  ThirdParty/PSCommon/XnLib/Source/XnStrings.cpp
+  ThirdParty/PSCommon/XnLib/Source/XnThreads.cpp
+  ThirdParty/PSCommon/XnLib/Source/XnUSB.cpp
+  ThirdParty/PSCommon/XnLib/Source/XnVector3D.cpp
 )
 
-set(XnLib_INCLUDE_DIRS ./ThirdParty/PSCommon/XnLib/Include/)
+set(XnLib_INCLUDE_DIRS ./ThirdParty/PSCommon/XnLib/Include)
 
-# set the DepthUtils sources
-file(GLOB DepthUtils_SRC
-  "./Source/DepthUtils/*.cpp"
-)
+include_directories(${XnLib_INCLUDE_DIRS})
+
+add_library(xnlib STATIC ${XnLib_SRC})
+set_property(TARGET xnlib PROPERTY POSITION_INDEPENDENT_CODE ON)
+
 set(DepthUtils_LIBS rt)
 set(DepthUtils_INCLUDE_DIRS ./Source/DepthUtils/ ./Source/DepthUtils/Include ${XnLib_INCLUDE_DIRS})
 
@@ -120,46 +122,14 @@ set(openni2_oni_SRC ${openni2_oni_SRC} ${XnLib_SRC})
 add_library(OniFile ${openni2_oni_SRC})
 install(TARGETS OniFile LIBRARY DESTINATION lib/OpenNI2/Drivers ARCHIVE DESTINATION lib)
 
-# Build OpenNI PS1080 Drivers
-include_directories("./Source/Drivers/PS1080/")
-include_directories("./Source/Drivers/PS1080/Include/")
+# Build drivers
 include_directories("./Include/")
-include_directories(${DepthUtils_INCLUDE_DIRS})
-file(GLOB openni2_ps1080_SRC
-  "./Source/DepthUtils/*.cpp"
-  "./Source/Drivers/PS1080/Core/*.cpp"
-  "./Source/Drivers/PS1080/DDK/*.cpp"
-  "./Source/Drivers/PS1080/DriverImpl/*.cpp"
-  "./Source/Drivers/PS1080/Formats/*.cpp"
-  "./Source/Drivers/PS1080/Sensor/*.cpp"
-)
-set(openni2_ps1080_SRC ${openni2_ps1080_SRC} ${XnLib_SRC})
-add_library(PS1080 SHARED ${openni2_ps1080_SRC})
-target_link_libraries(PS1080 ${XnLib_LIBS})
-install(TARGETS PS1080 LIBRARY DESTINATION lib/OpenNI2/Drivers ARCHIVE DESTINATION lib)
 
-# Build OpenNI Orbbec Drivers
+#orbbec wants it. Why not store it to driver side?
 include_directories("./ThirdParty/Orbbec/Include/")
-
-include_directories("./Source/Drivers/orbbec/")
-include_directories("./Source/Drivers/orbbec/Include/")
-include_directories("./Include/")
-include_directories(${DepthUtils_INCLUDE_DIRS})
-file(GLOB openni2_orbbec_SRC
-  "./Source/DepthUtils/*.cpp"
-  "./Source/Drivers/orbbec/Core/*.cpp"
-  "./Source/Drivers/orbbec/DDK/*.cpp"
-  "./Source/Drivers/orbbec/DriverImpl/*.cpp"
-  "./Source/Drivers/orbbec/Formats/*.cpp"
-  "./Source/Drivers/orbbec/Sensor/*.cpp"
-)
-set(openni2_orbbec_SRC ${openni2_orbbec_SRC} ${XnLib_SRC})
-add_library(orbbec SHARED ${openni2_orbbec_SRC})
-target_link_libraries(orbbec ${XnLib_LIBS})
-install(TARGETS orbbec LIBRARY DESTINATION lib/OpenNI2/Drivers ARCHIVE DESTINATION lib)
+add_subdirectory(Source)
 
 # Build OpenNI
-include_directories("./Include")
 include_directories("./Source/Drivers/OniFile/Formats/")
 include_directories("./Source/Drivers/OniFile/")
 include_directories(${XnLib_INCLUDE_DIRS})
