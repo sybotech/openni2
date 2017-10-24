@@ -839,7 +839,20 @@ XnStatus XnSensorImageStream::CreateDataProcessor(XnDataProcessor** ppProcessor)
 
 	XnStreamProcessor* pNew;
 
-	switch (m_InputFormat.GetValue())
+	OniPixelFormat outputFormat = GetOutputFormat();
+	XnUInt64 inputFormat = m_InputFormat.GetValue();
+
+	/// Try to force JPEG. Got nothing good
+	//inputFormat = XN_IO_IMAGE_FORMAT_JPEG;
+
+	/// Forced bayer ... and got nothing especial
+	//inputFormat = XN_IO_IMAGE_FORMAT_BAYER;
+
+	/// Actual format, instead of '1'
+	//inputFormat = XN_IO_IMAGE_FORMAT_UNCOMPRESSED_YUV422;
+
+
+	switch (inputFormat)
 	{
 	case XN_IO_IMAGE_FORMAT_BAYER:
 		XN_VALIDATE_NEW_AND_INIT(pNew, XnBayerImageProcessor, this, &m_Helper, pBufferManager);

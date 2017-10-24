@@ -109,7 +109,7 @@ protected:
 	*/
 	inline XnUInt32 GetExpectedOutputSize()
 	{
-		return GetStream()->GetRequiredDataSize();
+		return GetStream()->GetRequiredDataSize() * 2;
 	}
 
 	/*

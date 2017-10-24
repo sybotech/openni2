@@ -167,4 +167,8 @@ install(FILES "./Include/Linux-Arm/OniPlatformLinux-Arm.h" DESTINATION include/o
 configure_file(openni2-config.cmake.in "${PROJECT_BINARY_DIR}/InstallFiles/openni2-config.cmake" @ONLY)
 install(FILES "${PROJECT_BINARY_DIR}/InstallFiles/openni2-config.cmake" DESTINATION share/openni2)
 
-add_subdirectory("Samples")
+option(OPENNI2_BUILD_SAMPLES "Build samples for openni2" OFF)
+
+if(OPENNI2_BUILD_SAMPLES)
+	add_subdirectory("Samples")
+endif(OPENNI2_BUILD_SAMPLES)
