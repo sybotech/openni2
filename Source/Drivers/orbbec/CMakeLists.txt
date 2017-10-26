@@ -10,6 +10,12 @@ file(GLOB openni2_orbbec_SRC
   "Sensor/*.cpp"
 )
 
+option(OPENNI_ORBBEC_SOFTFILTER "Use software filter for depth data" ON)
+
+if(OPENNI_ORBBEC_SOFTFILTER)
+	add_definitions(-DFILTER=1)
+endif(OPENNI_ORBBEC_SOFTFILTER)
+
 set(openni2_orbbec_SRC ${openni2_orbbec_SRC} ${depth_utils_SRC})
 add_library(orbbec SHARED ${openni2_orbbec_SRC})
 target_link_libraries(orbbec ${XnLib_LIBS} xnlib)
