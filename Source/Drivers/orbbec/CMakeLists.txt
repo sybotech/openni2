@@ -12,7 +12,7 @@ file(GLOB openni2_orbbec_SRC
 
 set(ADDITIONAL_LIBRARIES "")
 
-option(OPENNI_ORBBEC_SOFTFILTER "Use software filter for depth data" ON)
+option(OPENNI2_ORBBEC_SOFTFILTER "Use software filter for depth data" ON)
 
 if(OPENNI2_ORBBEC_SOFTFILTER)
 	add_definitions(-DFILTER=1)
